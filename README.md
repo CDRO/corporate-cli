@@ -191,13 +191,15 @@ The required workflow is:
 3. For each ticket or subtask worked on in that version, create a new branch from the version branch, not from `main`.
 4. Ticket branch names follow the pattern `version/xy/<ticket-slug>`.
 5. Finish the work on the ticket branch and squash-merge it back into the version branch.
-6. Do not merge ticket branches directly into `main`.
-7. Once the version is complete and validated, merge the version branch into `main`.
+6. After every accepted merge into a version branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
+7. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
+8. Do not merge ticket branches directly into `main`.
+9. Once the version is complete and validated, merge the version branch into `main`.
 
 The intended flow is:
 
 ```text
-main -> version/xy -> version/xy/<ticket-slug> -> squash merge -> version/xy -> review -> main
+main -> version/xy -> version/xy/<ticket-slug> -> squash merge -> version/xy -> auto release -> review -> main
 ```
 
-This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely.
+This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely. Every merge into the active version branch is treated as a release candidate, and the release bundle must include Linux, macOS, and Windows builds.

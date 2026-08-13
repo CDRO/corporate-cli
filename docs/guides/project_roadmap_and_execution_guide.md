@@ -26,6 +26,35 @@ The repository must follow a version-based branch workflow so that both develope
 
 This prevents long-lived feature branches from drifting away from `main`, keeps each version isolated, and gives every issue a clear, reviewable delivery path.
 
+## Release automation after merge (mandatory)
+Every accepted merge into a version branch must immediately trigger a GitHub release.
+
+1. Release tags must follow the format `v<major>.<minor>.0`, where `<major>` is the milestone number and `<minor>` is the next release counter for that milestone.
+2. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
+3. A merge into `version/00` produces a `v0.<n>.0` release; a merge into `version/01` produces a `v1.<n>.0` release.
+4. The GitHub release must be generated automatically by CI/CD as soon as the merge lands on the version branch.
+5. Every release artifact bundle must contain builds for Linux, macOS, and Windows.
+6. Release notes must describe the merged scope and attach the generated binaries for the target platform set.
+
+This keeps version branches traceable, reviewable, and reliably shippable without manual release bookkeeping.
+
+## AI review gate (mandatory)
+Every ticket branch must be reviewed by an AI agent before it can be merged into its parent version branch.
+
+1. After work on a ticket is complete, the AI must perform an adversarial review against the ticket requirements, the milestone scope, and the project rules.
+2. The review must follow the subbranch review guideline and must use up to 10 review passes if needed.
+3. The review result must be recorded in a dedicated review artifact before the merge request is approved.
+4. The review must produce explicit blockers, required fixes, verification commands, and a final verdict.
+5. No ticket branch may be merged into `version/xy` unless the review passes and all blockers are fixed.
+6. The merge is blocked if the review artifact is missing, incomplete, or rejected.
+7. This rule applies to both human and AI implementations.
+
+The intended flow becomes:
+
+`main` -> `version/xy` -> `version/xy/<ticket-slug>` -> AI review -> fix issues -> squash merge -> `version/xy` -> review -> `main`
+
+This ensures that AI-generated work is checked by an independent, adversarial review pass before it enters the version branch.
+
 ---
 
 ## Phase 0: foundation and MVP

@@ -29,16 +29,28 @@ GOOS=darwin GOARCH=amd64 go build -o corporate-darwin-amd64 ./cmd/corporate
 GOOS=windows GOARCH=amd64 go build -o corporate-windows-amd64.exe ./cmd/corporate
 ```
 
+## Release automation requirements
+- every merge into a version branch must trigger GitHub release creation automatically
+- release tags must use the pattern `<version>.<minor>.0`, where:
+  - `<version>` is the name of the GitHub milestone that the ticket is attached to, for example `v0`, `v1`, or `v2`
+  - `<minor>` is the milestone number recorded in the ticket description, for example `1`, `16`, or `18`
+- examples: `v0.1.0`, `v0.16.0`, `v1.18.0`
+- the version branch must automatically publish a release bundle containing all supported OS builds
+- the release bundle should include Linux, macOS, and Windows binaries, plus checksums and a short note of the merged work
+
 ## Packaging ideas
 - zip or tarball each OS binary
 - add expected SHA256 checksums for release artifacts
 - document install paths in the README
+- store release artifacts in GitHub Releases generated from the version branch
 
 ## Acceptance criteria
 - Linux build command works
 - Windows build command works
 - cross-compilation is demonstrable
 - a user can run the binary with no extra framework dependencies
+- a GitHub release is created automatically from each version branch merge
+- the release bundle contains builds for all supported operating systems
 
 ## Open questions
 - Should the project ship artifacts on release or only provide build instructions?
