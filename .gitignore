@@ -1,0 +1,21 @@
+# Build artifacts
+/bin/
+/*.exe
+/*.dll
+/*.so
+/*.dylib
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Test artifacts
+coverage.out
+
+# Temporary files
+*.tmp
+*.log
