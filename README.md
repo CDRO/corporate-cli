@@ -203,3 +203,5 @@ main -> version/xy -> version/xy/<ticket-slug> -> squash merge -> version/xy -> 
 ```
 
 This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely. Every merge into the active version branch is treated as a release candidate, and the release bundle must include Linux, macOS, and Windows builds.
+
+The project backlog follows the sequence: v0 foundation, release/distribution, and then auto-update support as the next milestone after release.

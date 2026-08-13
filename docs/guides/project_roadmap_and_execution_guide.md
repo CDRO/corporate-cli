@@ -92,8 +92,10 @@ Make the project build reproducibly for Linux, macOS, and Windows.
 ### Ticket 11: release and distribution
 Package the CLI and document install and release steps.
 
-### Ticket 12: roadmap and future work
-Keep the long-term architecture visible without forcing a premature design.
+### Ticket 12: auto update
+Define the update flow for notifying users and delivering the next binary build automatically after a successful release.
+
+This milestone follows milestone 11 directly and represents the next release-facing capability after distribution is working.
 
 ### Ticket 13: regex strategy and text normalization
 Define a repeatable normalization and regex approach for detection and rewriting.
