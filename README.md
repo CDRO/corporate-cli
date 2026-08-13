@@ -179,3 +179,25 @@ This project is provided as-is for demonstration and experimentation purposes.
 ## Contributing
 
 Open an issue or send a pull request if you want to improve tone detection, output quality, or platform support.
+
+## Branching and milestone workflow
+
+This project uses GitHub version milestones as the delivery unit. A GitHub milestone is not a feature branch; it is a version phase such as `v0`, `v1`, or `v2`.
+
+The required workflow is:
+
+1. When work begins on a version milestone, create a branch from `main` named `version/xy`, where `xy` is the version number.
+2. Examples: `version/00`, `version/01`, `version/02`.
+3. For each ticket or subtask worked on in that version, create a new branch from the version branch, not from `main`.
+4. Ticket branch names follow the pattern `version/xy/<ticket-slug>`.
+5. Finish the work on the ticket branch and squash-merge it back into the version branch.
+6. Do not merge ticket branches directly into `main`.
+7. Once the version is complete and validated, merge the version branch into `main`.
+
+The intended flow is:
+
+```text
+main -> version/xy -> version/xy/<ticket-slug> -> squash merge -> version/xy -> review -> main
+```
+
+This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely.

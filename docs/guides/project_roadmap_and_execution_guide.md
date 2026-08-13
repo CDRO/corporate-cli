@@ -1,15 +1,30 @@
-﻿# Master Roadmap: corporate / etaroproc
+﻿# Project Roadmap and Execution Guide
 
 ## Product vision
-Create a deterministic, reviewable CLI that rewrites text into a polished corporate tone and exposes an inverse `etaroproc` mode that converts corporate language back into blunt, direct wording. The project should keep the rules-based core simple and testable before layer-by-layer AI and auth features are added.
+Create a deterministic, reviewable CLI that rewrites text into polished corporate tone and exposes an inverse etaroproc mode that converts corporate language back into blunt, direct wording. The project should keep the rules-based core simple and testable before layer-by-layer AI and auth features are added.
 
 ## Core product concept
-- `corporate`: turns blunt, angry, chaotic, or insulting input into cleaner business-friendly language.
-- `etaroproc`: inverse mode activated by binary name; accepts the same broad I/O contract but does not expose login or provider flows.
+- corporate: turns blunt, angry, chaotic, or insulting input into cleaner business-friendly language.
+- etaroproc: inverse mode activated by binary name; accepts the same broad I/O contract but does not expose login or provider flows.
 - Both modes should work with stdin, files, stdout, and shell/PowerShell pipelines.
 
 ## Roadmap structure
-The milestone docs in this repository are the source of truth. The sequence below matches the actual numbered files and avoids duplicate tickets and stale references.
+The roadmap is deliberately staged so the team can ship a reliable core first and only add AI and auth complexity after the base behavior is stable.
+
+## Branching policy (mandatory)
+The repository must follow a version-based branch workflow so that both developers and AI agents stay aligned with the GitHub version milestones used for delivery.
+
+1. When work begins on a GitHub version milestone, create a branch from `main` named `version/xy`, where `xy` is the version number. Examples: `version/00`, `version/01`, `version/02`.
+2. A version branch must be created only once active work for that version begins; it must not exist before implementation starts.
+3. For each ticket or subtask worked on within that version, create a new branch from the version branch, not from `main`.
+4. Ticket branch names must follow the pattern `version/xy/<ticket-slug>`, for example `version/01/rewrite-pipeline` or `version/02/provider-integration`.
+5. All ticket work must be completed on the ticket branch and then squash-merged back into the version branch.
+6. Ticket branches must never be merged directly into `main`.
+7. The version branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
+8. Only after the version is fully reviewed and validated should the version branch be merged into `main`.
+9. In short: `main` -> `version/xy` -> `version/xy/<ticket-slug>` -> squash merge back to `version/xy` -> review -> `main`.
+
+This prevents long-lived feature branches from drifting away from `main`, keeps each version isolated, and gives every issue a clear, reviewable delivery path.
 
 ---
 
@@ -19,7 +34,7 @@ The milestone docs in this repository are the source of truth. The sequence belo
 Create the Go module and package layout.
 
 ### Ticket 02: CLI contract and UX
-Add stdin/stdout flow and core flags such as `--help`, `--input`, and `--output`.
+Add stdin/stdout flow and core flags such as --help, --input, and --output.
 
 ### Ticket 03: input/output handling
 Handle file-based and pipeline-based text flows reliably.
@@ -31,7 +46,7 @@ Implement the first deterministic harsh-phrase replacement logic.
 Add shared word lists, typo normalization, and profanity/insult replacements.
 
 ### Ticket 06: inverse corporate language mode
-Implement the `etaroproc` binary and its reverse transformation behavior.
+Implement the etaroproc binary and its reverse transformation behavior.
 
 ### Ticket 07: rewrite pipeline design
 Combine normalization, sentence handling, rule application, and formatting into a single pipeline.
@@ -62,9 +77,6 @@ Document and organize concrete regression cases for common use patterns.
 
 ### Ticket 16: review checklist
 Define a lightweight review process for future iterations.
-
-### Ticket 17: implementation order
-Record the recommended ordering for the first meaningful build path.
 
 ---
 
@@ -134,76 +146,14 @@ Allow reuse of common provider/style combinations through profiles.
 ### Ticket 37: result validation and safety checks
 Validate output before writing, and fall back when generation fails or looks suspicious.
 
----
+## Acceptance criteria
+- the implementation sequence is easy to follow
+- milestones are not skipped without justification
+- review feedback can be incorporated without rewriting the whole project
+- the project has a clear path from prototype to release
 
-## Priority breakdown
-
-### v1 must-have
-- 01 project setup and skeleton
-- 02 CLI contract and UX
-- 03 input/output handling
-- 04 rewrite rule engine
-- 05 lexicon design
-- 06 inverse corporate language mode
-- 07 rewrite pipeline design
-- 08 testing strategy
-- 09 release quality gates
-- 10 cross-platform build strategy
-- 11 release and distribution
-
-### v2 important
-- 18 AI provider integration
-- 19 AI login and authentication flow
-- 20 first-use credential fetch and local storage
-- 21 AI rewrite pipeline and prompt design
-- 22 logout, refresh, and credential rotation
-- 23 provider switching and multi-provider setup
-- 24 style templates and rewrite modes
-- 25 security and secret handling review
-- 26 AI fallback and graceful degradation
-- 27 configuration file design
-- 28 CLI command catalog
-- 29 AI cost, usage, and token awareness
-- 30 AI failover, retry, and rate-limit handling
-- 31 prompt template design for AI rewrite
-
-### Later / optional
-- 32 user feedback and improvement loop
-- 33 model selection strategy
-- 34 local model support and offline mode
-- 35 context window and chunking strategy
-- 36 presets and user profiles
-- 37 result validation and safety checks
-
----
-
-## Recommended order for the first 10 work items
-1. Ticket 01: project setup and skeleton
-2. Ticket 02: CLI contract and UX
-3. Ticket 03: input/output handling
-4. Ticket 04: rewrite rule engine
-5. Ticket 05: lexicon design
-6. Ticket 06: inverse corporate language mode
-7. Ticket 07: rewrite pipeline design
-8. Ticket 08: testing strategy
-9. Ticket 09: release quality gates
-10. Ticket 10: cross-platform build strategy
-
-## Implementation philosophy
-- Start with deterministic, explainable behavior.
-- Keep the core CLI usable without AI or auth.
-- build the inverse mode early because it is easy to test and a strong product differentiator.
-- add AI and provider complexity only after the rules engine is stable.
-- guard security, config, and output validation before broader release.
-
-## Risk areas to watch
-- over-sanitizing text and losing meaning
-- brittle regex replacements that are hard to review
-- AI output becoming generic or inaccurate
-- auth/config handling exposing secrets
-- long-input processing failing due to model limits
-- release quality dropping without a repeatable gate
-
-## Final summary
-The project should first become a reliable, deterministic CLI with two modes: `corporate` and `etaroproc`. Once that base is stable, the repository can safely add AI support, provider abstraction, login flow, prompt design, and operational polish. This keeps the project reviewable and avoids mixing feature work before the core rewrite engine is proven.
-
+## Recommended working pattern
+- Keep the rules engine deterministic and reviewable.
+- Grow complexity only after the core output is stable.
+- Treat AI, provider, and auth layers as optional enhancements rather than prerequisites.
+- Use this guide as the source of truth for both scope and sequencing.
