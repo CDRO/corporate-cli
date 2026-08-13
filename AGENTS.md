@@ -27,6 +27,7 @@ Before any implementation work, the agent must do all of the following:
 - [ ] Read the current state from `.copilot/v0_agent_state.md` if it exists and resume from that state
 - [ ] If the state file does not exist, create a clean empty checklist before starting work
 - [ ] Update the checklist and current state after each checkpoint or major milestone
+- [ ] Before finishing work, create a git commit with a descriptive message that explains what changed and why, and push the branch for review
 - [ ] Only continue after the bootstrap passes and the branch is valid
 
 ## Required branch workflow
@@ -38,8 +39,9 @@ The agent must follow the project delivery model exactly:
 3. Create the ticket subbranch: `version/<phase>/<ticket-slug>`
 4. Do all implementation work on the ticket subbranch only
 5. Re-run the bootstrap before continuing after interruption or restart
-6. After the ticket is complete, perform the required review and squash-merge back into the version branch
-7. Only merge the version branch into `main` after validation and review
+6. After the ticket is complete, create a git commit with a clear message that explains what changed and why, then push the ticket branch for review
+7. Perform the required review and squash-merge back into the version branch
+8. Only merge the version branch into `main` after validation and review
 
 ## Rules
 
