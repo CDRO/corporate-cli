@@ -83,6 +83,27 @@ if (-not (Test-Path (Join-Path $RepoRoot 'README.md')) -or -not (Test-Path (Join
     throw "ERROR: required project docs are missing. Restore README.md and the v0 build plan before continuing."
 }
 
+function Test-WorkBranch {
+    $branch = git branch --show-current 2>$null
+
+    if (-not $branch -or $branch -eq 'main' -or $branch -eq 'master') {
+        throw "ERROR: work must not start on main/master. Create a milestone branch and a ticket subbranch before implementation. Pattern: version/<phase>/<ticket-slug>."
+    }
+
+    if ($branch -match '^version/\d+$') {
+        throw "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>/<ticket-slug>"
+    }
+
+    if ($branch -notmatch '^version/\d+/[A-Za-z0-9._/-]+$') {
+        throw "ERROR: invalid branch '$branch'. Required pattern: version/<phase>/<ticket-slug>."
+    }
+
+    Write-Host "Validated work branch: $branch"
+}
+
+Set-Location $RepoRoot
+Test-WorkBranch
+
 New-Item -ItemType Directory -Force -Path (Join-Path $RepoRoot '.copilot') | Out-Null
 if (Test-Path $StateFile) {
     Write-Host ""

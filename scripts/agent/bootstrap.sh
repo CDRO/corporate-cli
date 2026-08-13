@@ -61,6 +61,31 @@ if [[ ! -f "$REPO_ROOT/README.md" ]] || [[ ! -f "$REPO_ROOT/docs/guides/v0_ai_ag
   exit 1
 fi
 
+validate_work_branch() {
+  local branch
+  branch="$(git branch --show-current 2>/dev/null || true)"
+
+  if [[ -z "$branch" || "$branch" == "main" || "$branch" == "master" ]]; then
+    echo "ERROR: work must not start on main/master. Create a milestone branch and a ticket subbranch before implementation. Pattern: version/<phase>/<ticket-slug>." >&2
+    exit 1
+  fi
+
+  if [[ "$branch" =~ ^version/[0-9]+$ ]]; then
+    echo "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>/<ticket-slug>" >&2
+    exit 1
+  fi
+
+  if [[ ! "$branch" =~ ^version/[0-9]+/[A-Za-z0-9._/-]+$ ]]; then
+    echo "ERROR: invalid branch '$branch'. Required pattern: version/<phase>/<ticket-slug>." >&2
+    exit 1
+  fi
+
+  printf 'Validated work branch: %s\n' "$branch"
+}
+
+cd "$REPO_ROOT"
+validate_work_branch
+
 mkdir -p "$REPO_ROOT/.copilot"
 if [[ ! -f "$STATE_FILE" ]]; then
   write_agent_state "unknown" "not started" "not_started" "bash scripts/agent/bootstrap.sh" "none" "start by reading README.md and the v0 build plan, then confirm repo health"
