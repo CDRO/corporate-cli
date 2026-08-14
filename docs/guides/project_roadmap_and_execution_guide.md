@@ -18,11 +18,14 @@ The repository must follow a version-based branch workflow so that both develope
 2. A release branch must be created only once active work for that version begins; it must not exist before implementation starts.
 3. For each ticket or subtask worked on within that version, create a new branch from the release branch, not from `main`.
 4. Ticket branch names must follow the pattern `version/xy-release/<ticket-slug>`, for example `version/01-release/rewrite-pipeline` or `version/02-release/provider-integration`.
-5. All ticket work must be completed on the ticket branch and then squash-merged back into the release branch.
-6. Ticket branches must never be merged directly into `main`.
-7. The release branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
-8. Only after the version is fully reviewed and validated should the release branch be merged into `main`.
-9. In short: `main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> squash merge back to `version/xy-release` -> review -> `main`.
+5. All ticket work must be completed on the ticket branch and then pushed to GitHub for review.
+6. Ticket branches must be reviewed on GitHub before they are merged. Fix-ups must happen on the same branch and be pushed again before approval.
+7. After approval, the ticket branch is merged on GitHub into the release branch.
+8. After the GitHub merge completes, the local machine must pull the release branch with `git pull --ff-only origin version/xy-release` before continuing work.
+9. Ticket branches must never be merged directly into `main`.
+10. The release branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
+11. Only after the version is fully reviewed and validated should the release branch be merged into `main`.
+12. In short: `main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> push -> GitHub review -> fix-up -> GitHub merge -> `git pull --ff-only origin version/xy-release` -> review -> `main`.
 
 This prevents long-lived feature branches from drifting away from `main`, keeps each version isolated, and gives every issue a clear, reviewable delivery path.
 
@@ -51,9 +54,9 @@ Every ticket branch must be reviewed by an AI agent before it can be merged into
 
 The intended flow becomes:
 
-`main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> AI review -> fix issues -> squash merge -> `version/xy-release` -> review -> `main`
+`main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> push to GitHub -> AI review -> fix issues on branch -> push again -> GitHub merge -> `git pull --ff-only origin version/xy-release` -> review -> `main`
 
-This ensures that AI-generated work is checked by an independent, adversarial review pass before it enters the release branch.
+This ensures that AI-generated work is checked by an independent, adversarial review pass before it enters the release branch, and that the local repo stays synchronized with the merged GitHub state.
 
 ---
 

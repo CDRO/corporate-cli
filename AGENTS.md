@@ -39,9 +39,11 @@ The agent must follow the project delivery model exactly:
 3. Create the ticket subbranch: `version/<phase>-release/<ticket-slug>`
 4. Do all implementation work on the ticket subbranch only
 5. Re-run the bootstrap before continuing after interruption or restart
-6. After the ticket is complete, create a git commit with a clear message that explains what changed and why, then push the ticket branch for review
-7. Perform the required review and squash-merge back into the release branch
-8. Only merge the release branch into `main` after validation and review
+6. After the ticket is complete, create a git commit with a clear message that explains what changed and why, then push the ticket branch to GitHub for review
+7. The branch must be reviewed in GitHub before merge. Any review findings must be fixed on the same ticket branch and pushed again before approval
+8. After review passes, merge the ticket branch on GitHub into the release branch
+9. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/<phase>-release`
+10. Only merge the release branch into `main` after validation and review
 
 ## Rules
 

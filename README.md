@@ -190,16 +190,19 @@ The required workflow is:
 2. Examples: `version/00-release`, `version/01-release`, `version/02-release`.
 3. For each ticket or subtask worked on in that version, create a new branch from the release branch, not from `main`.
 4. Ticket branch names follow the pattern `version/xy-release/<ticket-slug>`.
-5. Finish the work on the ticket branch and squash-merge it back into the release branch.
-6. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
-7. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
-8. Do not merge ticket branches directly into `main`.
-9. Once the version is complete and validated, merge the release branch into `main`.
+5. Finish the work on the ticket branch and push it to GitHub for review.
+6. The ticket branch must be reviewed on GitHub and any review findings must be fixed on that ticket branch and pushed again before merge approval.
+7. After review passes, merge the ticket branch on GitHub into the release branch.
+8. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
+9. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
+10. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
+11. Do not merge ticket branches directly into `main`.
+12. Once the version is complete and validated, merge the release branch into `main`.
 
 The intended flow is:
 
 ```text
-main -> version/xy-release -> version/xy-release/<ticket-slug> -> squash merge -> version/xy-release -> auto release -> review -> main
+main -> version/xy-release -> version/xy-release/<ticket-slug> -> push -> GitHub review -> fix-up -> GitHub merge -> git pull --ff-only origin version/xy-release -> auto release -> review -> main
 ```
 
 This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely. Every merge into the active version branch is treated as a release candidate, and the release bundle must include Linux, macOS, and Windows builds.
