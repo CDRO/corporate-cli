@@ -7,6 +7,12 @@ import (
 )
 
 func TestDefaultStorePathUsesUserConfigDir(t *testing.T) {
+	old := os.Getenv("APPDATA")
+	defer os.Setenv("APPDATA", old)
+	if err := os.Setenv("APPDATA", t.TempDir()); err != nil {
+		t.Fatalf("set APPDATA: %v", err)
+	}
+
 	path, err := DefaultStorePath()
 	if err != nil {
 		t.Fatalf("DefaultStorePath returned error: %v", err)
@@ -22,7 +28,6 @@ func TestDefaultStorePathUsesUserConfigDir(t *testing.T) {
 func TestStoreLoginPersistsProviderKey(t *testing.T) {
 	dir := t.TempDir()
 	store := Store{Path: filepath.Join(dir, "config.json")}
-
 	if err := store.Login("openai", "test-token"); err != nil {
 		t.Fatalf("Login returned error: %v", err)
 	}
@@ -35,14 +40,13 @@ func TestStoreLoginPersistsProviderKey(t *testing.T) {
 		t.Fatalf("expected provider openai, got %q", cfg.Provider)
 	}
 	if cfg.APIKey != "test-token" {
-		t.Fatalf("expected API key to be persisted, got %q", cfg.APIKey)
+		t.Fatalf("expected API key test-token, got %q", cfg.APIKey)
 	}
 }
 
-func TestStoreStatusReportsMissingCredentials(t *testing.T) {
+func TestStoreStatusReportsNotConfiguredWhenMissing(t *testing.T) {
 	dir := t.TempDir()
 	store := Store{Path: filepath.Join(dir, "config.json")}
-
 	status, err := store.Status()
 	if err != nil {
 		t.Fatalf("Status returned error: %v", err)
@@ -64,14 +68,11 @@ func TestLoadConfigReturnsEmptyConfigForMissingFile(t *testing.T) {
 }
 
 func TestWriteConfigDoesNotCreateSecretsInPlainTextOutput(t *testing.T) {
-	dir := t.TempDir()
-	path := filepath.Join(dir, "config.json")
+	path := filepath.Join(t.TempDir(), "config.json")
 	cfg := Config{Provider: "openai", APIKey: "secret-token"}
-
 	if err := WriteConfig(path, cfg); err != nil {
 		t.Fatalf("WriteConfig returned error: %v", err)
 	}
-
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read config file: %v", err)
