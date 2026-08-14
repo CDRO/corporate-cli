@@ -12,11 +12,11 @@ The review is designed to be repeated up to 10 times for the same subbranch. Eac
 ## Scope
 This review applies to any branch of the form:
 
-- `version/xy/<ticket-slug>`
+- `version/xy-release/<ticket-slug>`
 
 and is performed before the ticket branch is squash-merged into:
 
-- `version/xy`
+- `version/xy-release`
 
 The reviewer must treat the code as if it were being audited for a real release candidate.
 

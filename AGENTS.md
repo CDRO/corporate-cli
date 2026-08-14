@@ -22,8 +22,8 @@ Before any implementation work, the agent must do all of the following:
 
 - [ ] Run the bootstrap guardrail: `powershell -ExecutionPolicy Bypass -File .\scripts\agent\bootstrap.ps1`
 - [ ] If the bootstrap fails, stop immediately and create the correct branch structure instead of continuing on main
-- [ ] Work only on a ticket subbranch in the required pattern: `version/<phase>/<ticket-slug>`
-- [ ] Do not work directly on `main` or on a milestone-only branch such as `version/00`
+- [ ] Work only on a ticket subbranch in the required pattern: `version/<phase>-release/<ticket-slug>`
+- [ ] Do not work directly on `main` or on a milestone-only branch such as `version/00-release`
 - [ ] Read the current state from `.copilot/v0_agent_state.md` if it exists and resume from that state
 - [ ] If the state file does not exist, create a clean empty checklist before starting work
 - [ ] Update the checklist and current state after each checkpoint or major milestone
@@ -35,13 +35,13 @@ Before any implementation work, the agent must do all of the following:
 The agent must follow the project delivery model exactly:
 
 1. Start from `main`
-2. Create the version milestone branch: `version/<phase>`
-3. Create the ticket subbranch: `version/<phase>/<ticket-slug>`
+2. Create the version release branch: `version/<phase>-release`
+3. Create the ticket subbranch: `version/<phase>-release/<ticket-slug>`
 4. Do all implementation work on the ticket subbranch only
 5. Re-run the bootstrap before continuing after interruption or restart
 6. After the ticket is complete, create a git commit with a clear message that explains what changed and why, then push the ticket branch for review
-7. Perform the required review and squash-merge back into the version branch
-8. Only merge the version branch into `main` after validation and review
+7. Perform the required review and squash-merge back into the release branch
+8. Only merge the release branch into `main` after validation and review
 
 ## Rules
 
