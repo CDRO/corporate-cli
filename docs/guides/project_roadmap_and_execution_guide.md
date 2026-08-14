@@ -8,8 +8,17 @@ Create a deterministic, reviewable CLI that rewrites text into polished corporat
 - etaroproc: inverse mode activated by binary name; accepts the same broad I/O contract but does not expose login or provider flows.
 - Both modes should work with stdin, files, stdout, and shell/PowerShell pipelines.
 
+## Source of truth and issue ordering (mandatory)
+The live project backlog is defined by GitHub milestones and issues. The repository does not use `docs/specs` as the execution source for active work.
+
+1. Work is grouped by GitHub milestone and ordered by milestone number ascending.
+2. Within each milestone, work proceeds by GitHub issue number ascending.
+3. The milestone issue list and its acceptance criteria are authoritative; local markdown specs are archival only.
+4. `docs/specs` must never be used to decide the next implementation step or the ordering of delivery work.
+5. If a document and a GitHub issue disagree, the GitHub issue wins.
+
 ## Roadmap structure
-The roadmap is deliberately staged so the team can ship a reliable core first and only add AI and auth complexity after the base behavior is stable.
+The roadmap is deliberately staged so the team can ship a reliable core first and only add AI and auth complexity after the base behavior is stable. The active roadmap is the GitHub issue backlog, not the historical milestone spec files in `docs/specs`.
 
 ## Branching policy (mandatory)
 The repository must follow a version-based branch workflow so that both developers and AI agents stay aligned with the GitHub version milestones used for delivery.
