@@ -74,10 +74,12 @@ jobs:
 
               first_line = next((line.strip() for line in body.splitlines() if line.strip()), '')
               if not re.match(r'^#+\s*Milestone \d+\s*', first_line, re.I):
-                  print(f"DEBUG: Skipping issue #{issue.get('number')} - does not start with a milestone header: {first_line}")
+                  print(f"DEBUG: Skipping issue #{issue.get('number')} - does not start with a milestone header: '{first_line}'")
                   continue
+              else:
+                  print(f"DEBUG: Processing issue #{issue.get('number')} - first line: '{first_line}'")
 
-              page_name = re.sub(r'^#+\s*Milestone \d+\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
+              page_name = re.sub(r'^#+\s*Milestone \d+:\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
               content = '\n'.join(line for line in body.splitlines()[1:] if line.strip())
               if not content:
                   content = issue.get('title', '').strip()
