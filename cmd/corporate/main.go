@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"corporate-cli/internal/transform"
 	"corporate-cli/internal/update"
 )
 
 const defaultAppVersion = "v0.1.0"
 
 func main() {
-	if err := run(os.Args[1:], os.Stdin, os.Stdout); err != nil {
+	if err := run(os.Args[1:], os.Stdin, os.Stdout, filepath.Base(os.Args[0])); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -52,22 +54,99 @@ func normalizeReleaseRepoURL(repo string) string {
 	return "https://api.github.com/repos/" + repo
 }
 
-func run(args []string, stdin io.Reader, stdout io.Writer) error {
+func run(args []string, stdin io.Reader, stdout io.Writer, appName string) error {
+	inverse := isInverseMode(appName, args)
+	if len(args) > 0 && args[0] == "--inverse" {
+		inverse = true
+		args = args[1:]
+	}
+	args = stripInverseFlag(args)
+
 	if len(args) == 0 {
-		return printHelp(stdout)
+		data, err := io.ReadAll(stdin)
+		if err != nil {
+			return err
+		}
+		text := strings.TrimSpace(string(data))
+		if text == "" {
+			return printHelp(stdout, inverse)
+		}
+		_, err = fmt.Fprintln(stdout, transformText(text, inverse))
+		return err
 	}
 
 	switch args[0] {
 	case "update":
+		if inverse {
+			return fmt.Errorf("inverse mode does not support update commands")
+		}
 		return handleUpdate(args[1:], stdout)
 	case "--help", "-h", "help":
-		return printHelp(stdout)
+		return printHelp(stdout, inverse)
+	case "--input":
+		if len(args) < 2 {
+			return fmt.Errorf("missing value for --input")
+		}
+		data, err := os.ReadFile(args[1])
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(stdout, transformText(string(data), inverse))
+		return err
 	default:
+		if inverse {
+			return fmt.Errorf("unknown inverse command %q", args[0])
+		}
 		return fmt.Errorf("unknown command %q", args[0])
 	}
 }
 
-func printHelp(w io.Writer) error {
+func isInverseMode(appName string, args []string) bool {
+	base := strings.TrimSuffix(filepath.Base(appName), filepath.Ext(filepath.Base(appName)))
+	if strings.EqualFold(base, "etaroproc") {
+		return true
+	}
+	for _, arg := range args {
+		if arg == "--inverse" {
+			return true
+		}
+	}
+	return false
+}
+
+func stripInverseFlag(args []string) []string {
+	filtered := make([]string, 0, len(args))
+	for _, arg := range args {
+		if arg == "--inverse" {
+			continue
+		}
+		filtered = append(filtered, arg)
+	}
+	return filtered
+}
+
+func transformText(input string, inverse bool) string {
+	if inverse {
+		return transform.InverseCorporateize(input)
+	}
+	return transform.Corporateize(input)
+}
+
+func printHelp(w io.Writer, inverse bool) error {
+	if inverse {
+		_, err := fmt.Fprint(w, strings.Join([]string{
+			"etaroproc CLI",
+			"",
+			"Usage:",
+			"  etaroproc --help",
+			"  etaroproc --input input.txt",
+			"  etaroproc < input.txt > output.txt",
+			"",
+			"Inverse mode turns polished language back into blunt, direct wording.",
+		}, "\n"))
+		return err
+	}
+
 	_, err := fmt.Fprint(w, strings.Join([]string{
 		"corporate CLI",
 		"",
