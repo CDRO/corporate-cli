@@ -84,17 +84,16 @@ jobs:
           issues = json.loads(issue_json)
 
           pages = []
-          milestone_pattern = re.compile(r'^#+\s*Milestone \d+\s*', re.I)
           for issue in issues:
               body = (issue.get('body') or '').strip()
               if not body:
                   continue
 
               first_line = next((line.strip() for line in body.splitlines() if line.strip()), '')
-              if not milestone_pattern.match(first_line):
+              if not re.match(r'^#+\s*Milestone \d+\s*', first_line, re.I):
                   continue
 
-              page_name = re.sub(milestone_pattern, '', first_line).strip() or issue.get('title', '').strip()
+              page_name = re.sub(r'^#+\s*Milestone \d+\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
               content = '\n'.join(line for line in body.splitlines()[1:] if line.strip())
               if not content:
                   content = issue.get('title', '').strip()
