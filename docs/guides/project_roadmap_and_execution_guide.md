@@ -21,11 +21,12 @@ The repository must follow a version-based branch workflow so that both develope
 5. All ticket work must be completed on the ticket branch and then pushed to GitHub for review.
 6. Ticket branches must be reviewed on GitHub before they are merged. Fix-ups must happen on the same branch and be pushed again before approval.
 7. After approval, the ticket branch is merged on GitHub into the release branch.
-8. After the GitHub merge completes, the local machine must pull the release branch with `git pull --ff-only origin version/xy-release` before continuing work.
-9. Ticket branches must never be merged directly into `main`.
-10. The release branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
-11. Only after the version is fully reviewed and validated should the release branch be merged into `main`.
-12. In short: `main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> push -> GitHub review -> fix-up -> GitHub merge -> `git pull --ff-only origin version/xy-release` -> review -> `main`.
+8. After the GitHub merge completes, the linked issue must be closed on GitHub if it has not already been auto-closed by the PR merge. Use the PR closing keyword such as `Closes #123` or close the issue immediately after the merge when automation is not in place.
+9. After the issue is closed, the local machine must pull the release branch with `git pull --ff-only origin version/xy-release` before continuing work.
+10. Ticket branches must never be merged directly into `main`.
+11. The release branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
+12. Only after the version is fully reviewed and validated should the release branch be merged into `main`.
+13. In short: `main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> push -> GitHub review -> fix-up -> GitHub merge -> close linked issue -> `git pull --ff-only origin version/xy-release` -> review -> `main`.
 
 This prevents long-lived feature branches from drifting away from `main`, keeps each version isolated, and gives every issue a clear, reviewable delivery path.
 

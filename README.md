@@ -211,19 +211,17 @@ The required workflow is:
 7. After each PR comment, the author must fix the issue on the same ticket branch in a dedicated commit and push it before the next review pass or merge approval. Silent fixes without a comment are not valid.
 8. The ticket branch must be reviewed on GitHub and any review findings must be fixed on that ticket branch and pushed again before merge approval.
 9. After review passes, merge the ticket branch on GitHub into the release branch.
-10. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
-11. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
-12. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
-13. Do not merge ticket branches directly into `main`.
-14. Once the version is complete and validated, merge the release branch into `main`.
-10. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
-11. Do not merge ticket branches directly into `main`.
-12. Once the version is complete and validated, merge the release branch into `main`.
+10. After the GitHub merge completes, close the linked issue on GitHub if it is not already auto-closed by the PR merge. Use the PR closing keyword such as `Closes #123` or close the issue immediately after the merge when automation is not in place.
+11. After the issue is closed, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
+12. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
+13. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
+14. Do not merge ticket branches directly into `main`.
+15. Once the version is complete and validated, merge the release branch into `main`.
 
 The intended flow is:
 
 ```text
-main -> version/xy-release -> version/xy-release/<ticket-slug> -> push -> GitHub review -> fix-up -> GitHub merge -> git pull --ff-only origin version/xy-release -> auto release -> review -> main
+main -> version/xy-release -> version/xy-release/<ticket-slug> -> push -> GitHub review -> fix-up -> GitHub merge -> close linked issue -> git pull --ff-only origin version/xy-release -> auto release -> review -> main
 ```
 
 This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely. Every merge into the active version branch is treated as a release candidate, and the release bundle must include Linux, macOS, and Windows builds.
