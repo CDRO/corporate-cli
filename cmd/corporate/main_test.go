@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -73,5 +75,41 @@ func TestRunInverseFlagUsesInverseMode(t *testing.T) {
 		if !strings.Contains(lower, want) {
 			t.Fatalf("expected inverse mode output to include %q, got %q", want, got)
 		}
+	}
+}
+
+func TestRunInputFileFlagReadsFileAndTransformsIt(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "input.txt")
+	content := "these dumbasses are totaly incompetent and this is a fucking mess"
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		t.Fatalf("write input file: %v", err)
+	}
+
+	var stdout bytes.Buffer
+	err := run([]string{"--input", path}, strings.NewReader("ignored"), &stdout, "corporate")
+	if err != nil {
+		t.Fatalf("run returned error: %v", err)
+	}
+
+	got := stdout.String()
+	if !strings.Contains(strings.ToLower(got), "significant") {
+		t.Fatalf("expected output to include corporate rewrite content, got %q", got)
+	}
+	for _, banned := range []string{"dumbasses", "fucking"} {
+		if strings.Contains(strings.ToLower(got), banned) {
+			t.Fatalf("expected harsh content to be removed, got %q", got)
+		}
+	}
+}
+
+func TestRunUnknownCommandReturnsError(t *testing.T) {
+	var stdout bytes.Buffer
+	err := run([]string{"not-a-command"}, strings.NewReader(""), &stdout, "corporate")
+	if err == nil {
+		t.Fatal("expected error for unknown command")
+	}
+	if !strings.Contains(err.Error(), "unknown command") {
+		t.Fatalf("expected unknown-command error, got %v", err)
 	}
 }
