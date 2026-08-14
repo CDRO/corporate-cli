@@ -1,5 +1,7 @@
 # Build artifacts
 /bin/
+/dist/
+/releases/
 /*.exe
 /*.dll
 /*.so
