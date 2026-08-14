@@ -152,3 +152,38 @@ func TestRunUnknownCommandReturnsError(t *testing.T) {
 		t.Fatalf("expected unknown-command error, got %v", err)
 	}
 }
+
+func TestRunLoginPersistsProviderCredential(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.json")
+	var stdout bytes.Buffer
+
+	err := run([]string{"login", "openai", "secret-token", "--config", path}, strings.NewReader("ignored"), &stdout, "corporate")
+	if err != nil {
+		t.Fatalf("run returned error: %v", err)
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read config file: %v", err)
+	}
+	if !strings.Contains(string(data), "openai") || !strings.Contains(string(data), "secret-token") {
+		t.Fatalf("expected config to persist API and provider, got %q", string(data))
+	}
+}
+
+func TestRunStyleFlagChangesPromptingOutput(t *testing.T) {
+	var stdout bytes.Buffer
+	input := "this is a mess"
+
+	err := run([]string{"--style", "executive", "--input", "-"}, strings.NewReader(input), &stdout, "corporate")
+	if err != nil {
+		t.Fatalf("run returned error: %v", err)
+	}
+
+	got := stdout.String()
+	lower := strings.ToLower(got)
+	if !strings.Contains(lower, "operational") && !strings.Contains(lower, "challenge") && !strings.Contains(lower, "current") {
+		t.Fatalf("expected a polished corporate rewrite, got %q", got)
+	}
+}
