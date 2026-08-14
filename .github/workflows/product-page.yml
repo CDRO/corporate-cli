@@ -3,7 +3,7 @@ name: Product page and v0 release artifacts
 on:
   push:
     branches:
-      - 'version/*-release'
+      - main
   workflow_dispatch:
 
 permissions:
