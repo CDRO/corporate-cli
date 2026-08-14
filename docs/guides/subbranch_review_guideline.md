@@ -27,7 +27,7 @@ This review applies to any branch of the form:
 
 - `version/xy-release/<ticket-slug>`
 
-and is performed before the ticket branch is squash-merged into:
+and is performed before the ticket branch is merged into:
 
 - `version/xy-release`
 
