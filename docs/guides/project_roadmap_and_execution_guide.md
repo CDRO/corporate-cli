@@ -46,11 +46,14 @@ Every ticket branch must be reviewed by an AI agent before it can be merged into
 
 1. After work on a ticket is complete, the AI must perform an adversarial review against the ticket requirements, the milestone scope, and the project rules.
 2. The review must follow the subbranch review guideline and must use up to 10 review passes if needed.
-3. The review result must be recorded in a dedicated review artifact before the merge request is approved.
-4. The review must produce explicit blockers, required fixes, verification commands, and a final verdict.
-5. No ticket branch may be merged into `version/xy-release` unless the review passes and all blockers are fixed.
-6. The merge is blocked if the review artifact is missing, incomplete, or rejected.
-7. This rule applies to both human and AI implementations.
+3. Every review pass must be posted as a separate PR comment before the fix is accepted. The comment must describe the specific blocker, the required fix, and the expected verification evidence.
+4. After each PR comment, the author must fix the issue on the same ticket branch in a dedicated commit and push it before moving to the next review pass or requesting merge approval.
+5. The review result must be recorded in a dedicated review artifact before the merge request is approved.
+6. The review must produce explicit blockers, required fixes, verification commands, and a final verdict.
+7. No ticket branch may be merged into `version/xy-release` unless the review passes and all blockers are fixed.
+8. The merge is blocked if the review artifact is missing, incomplete, or rejected.
+9. A silent fix without a corresponding PR comment and fix commit is not valid review work and does not count as compliance.
+10. This rule applies to both human and AI implementations.
 
 The intended flow becomes:
 
