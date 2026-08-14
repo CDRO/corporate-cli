@@ -103,6 +103,45 @@ func TestRunInputFileFlagReadsFileAndTransformsIt(t *testing.T) {
 	}
 }
 
+func TestRunMissingInputFileReturnsError(t *testing.T) {
+	var stdout bytes.Buffer
+	err := run([]string{"--input", filepath.Join(t.TempDir(), "missing.txt")}, strings.NewReader("ignored"), &stdout, "corporate")
+	if err == nil {
+		t.Fatal("expected missing input file error")
+	}
+	if !strings.Contains(err.Error(), "no such file") && !strings.Contains(err.Error(), "missing") {
+		t.Fatalf("expected file-not-found error, got %v", err)
+	}
+}
+
+func TestRunEmptyInputFileProducesEmptyOutput(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "empty.txt")
+	if err := os.WriteFile(path, []byte(""), 0o600); err != nil {
+		t.Fatalf("write empty input file: %v", err)
+	}
+
+	var stdout bytes.Buffer
+	err := run([]string{"--input", path}, strings.NewReader("ignored"), &stdout, "corporate")
+	if err != nil {
+		t.Fatalf("run returned error for empty input file: %v", err)
+	}
+	if got := stdout.String(); strings.TrimSpace(got) != "" {
+		t.Fatalf("expected empty output for empty input file, got %q", got)
+	}
+}
+
+func TestRunInvalidFlagValueReturnsError(t *testing.T) {
+	var stdout bytes.Buffer
+	err := run([]string{"--input"}, strings.NewReader("ignored"), &stdout, "corporate")
+	if err == nil {
+		t.Fatal("expected error for invalid --input flag value")
+	}
+	if !strings.Contains(err.Error(), "missing value") {
+		t.Fatalf("expected missing value error, got %v", err)
+	}
+}
+
 func TestRunUnknownCommandReturnsError(t *testing.T) {
 	var stdout bytes.Buffer
 	err := run([]string{"not-a-command"}, strings.NewReader(""), &stdout, "corporate")
