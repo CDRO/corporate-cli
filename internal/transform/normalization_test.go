@@ -20,6 +20,21 @@ func TestNormalizeTextCleansCommonNoise(t *testing.T) {
 	}
 }
 
+func TestNormalizeTextHandlesRegexStrategyCases(t *testing.T) {
+	input := "THIS IS A DISASTER!!!\r\nvery very very bad???"
+	got := normalizeText(input)
+
+	if containsFold(got, "!!!") {
+		t.Fatalf("expected repeated punctuation to be collapsed, got %q", got)
+	}
+	if containsFold(got, "very very") {
+		t.Fatalf("expected repeated words to be condensed, got %q", got)
+	}
+	if !containsFold(got, "this is a disaster") {
+		t.Fatalf("expected shout normalization to preserve the message, got %q", got)
+	}
+}
+
 func containsFold(s, substr string) bool {
 	if substr == "" {
 		return true
