@@ -87,15 +87,15 @@ function Test-WorkBranch {
     $branch = git branch --show-current 2>$null
 
     if (-not $branch -or $branch -eq 'main' -or $branch -eq 'master') {
-        throw "ERROR: work must not start on main/master. Create a milestone branch and a ticket subbranch before implementation. Pattern: version/<phase>/<ticket-slug>."
+        throw "ERROR: work must not start on main/master. Create a release branch and a ticket subbranch before implementation. Pattern: version/<phase>-release and version/<phase>-release/<ticket-slug>."
     }
 
-    if ($branch -match '^version/\d+$') {
-        throw "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>/<ticket-slug>"
+    if ($branch -match '^version/\d+-release$') {
+        throw "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>-release/<ticket-slug>"
     }
 
-    if ($branch -notmatch '^version/\d+/[A-Za-z0-9._/-]+$') {
-        throw "ERROR: invalid branch '$branch'. Required pattern: version/<phase>/<ticket-slug>."
+    if ($branch -notmatch '^version/\d+-release/[A-Za-z0-9._/-]+$') {
+        throw "ERROR: invalid branch '$branch'. Required pattern: version/<phase>-release/<ticket-slug>."
     }
 
     Write-Host "Validated work branch: $branch"
