@@ -1,21 +1,21 @@
-# v0 Agent State
+﻿# v0 Agent State
 
-- branch: version/00-release
-- current ticket: not started
-- status: not_started
-- last verified command: none
-- last successful result: none
-- next action: read README.md and the v0 build plan, then confirm repo health and start with project bootstrap on the release branch
-- blocker: none
+- branch: version/00/auto-update
+- current ticket: auto-update
+- status: implemented
+- last verified command: go test ./...
+- last successful result: passed
+- next action: verify the CLI update commands and record the branch state before the next milestone
+- blocker: github auth required for PR review and push beyond local validation
 - repo root: C:\Users\tizia\Projekte\corporate-cli
-- last updated: <fill in timestamp>
+- last updated: 2026-08-14T09:30:00+02:00
 
 ## Resume checklist
-- [ ] read README.md
-- [ ] read docs/guides/project_roadmap_and_execution_guide.md
-- [ ] read docs/guides/acceptance_criteria_guide.md
-- [ ] read this file
-- [ ] confirm git status
-- [ ] confirm branch and repo root
-- [ ] run the last known validation command
-- [ ] continue from the next action only after verification
+- [x] read README.md
+- [x] read docs/guides/project_roadmap_and_execution_guide.md
+- [x] read docs/guides/acceptance_criteria_guide.md
+- [x] read this file
+- [x] confirm git status
+- [x] confirm branch and repo root
+- [x] run the last known validation command
+- [x] continue from the next action only after verification

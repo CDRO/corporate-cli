@@ -98,6 +98,22 @@ corporate --help
 corporate --help
 ```
 
+## Update checks
+
+The CLI exposes an explicit update flow instead of silently overwriting the installed binary.
+
+```sh
+corporate update --check
+corporate update --install
+```
+
+```powershell
+corporate update --check
+corporate update --install
+```
+
+`--check` compares the installed version to the latest GitHub release tag. `--install` prints the safe next step for a human-approved reinstall instead of forcing an in-place upgrade.
+
 ## Installation
 
 ### Linux / macOS
