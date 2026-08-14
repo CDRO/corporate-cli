@@ -15,7 +15,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      app_changed: ${{ steps.filter.outputs.app }}
+      app: ${{ steps.filter.outputs.app }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -84,16 +84,17 @@ jobs:
           issues = json.loads(issue_json)
 
           pages = []
+          milestone_pattern = re.compile(r'^#+\s*Milestone \d+\s*', re.I)
           for issue in issues:
               body = (issue.get('body') or '').strip()
               if not body:
                   continue
 
               first_line = next((line.strip() for line in body.splitlines() if line.strip()), '')
-              if not re.match(r'^#+\s*Milestone\b', first_line, re.I):
+              if not milestone_pattern.match(first_line):
                   continue
 
-              page_name = re.sub(r'^#+\s*Milestone\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
+              page_name = re.sub(milestone_pattern, '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
               content = '\n'.join(line for line in body.splitlines()[1:] if line.strip())
               if not content:
                   content = issue.get('title', '').strip()
@@ -198,7 +199,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.app == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.app == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -215,7 +216,7 @@ jobs:
   build-artifacts:
     runs-on: ubuntu-latest
     needs: [changes, test]
-    if: needs.changes.outputs.app == 'true'
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.app == 'true'
     strategy:
       fail-fast: false
       matrix:
