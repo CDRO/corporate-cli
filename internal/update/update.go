@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // ReleaseInfo models the GitHub release metadata required for a safe update check.
@@ -62,12 +63,23 @@ func CheckForRelease(repoURL, currentVersion string) (ReleaseInfo, error) {
 
 func checkForRelease(repoURL, currentVersion string) (ReleaseInfo, error) {
 	endpoint := strings.TrimRight(repoURL, "/") + "/releases/latest"
-	resp, err := http.Get(endpoint)
+	request, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return ReleaseInfo{Available: false, Message: "update check failed: invalid release URL"}, nil
+	}
+	request.Header.Set("Accept", "application/vnd.github+json")
+	request.Header.Set("User-Agent", "corporate-cli")
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(request)
 	if err != nil {
 		return ReleaseInfo{Available: false, Message: "update check failed: unable to reach release API"}, nil
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusNotFound {
+		return ReleaseInfo{Available: false, Message: "update check failed: no published release found yet"}, nil
+	}
 	if resp.StatusCode != http.StatusOK {
 		return ReleaseInfo{Available: false, Message: fmt.Sprintf("update check failed: release API returned %s", resp.Status)}, nil
 	}

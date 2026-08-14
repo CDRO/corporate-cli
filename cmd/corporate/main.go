@@ -9,13 +9,47 @@ import (
 	"corporate-cli/internal/update"
 )
 
-const appVersion = "v0.1.0"
+const defaultAppVersion = "v0.1.0"
 
 func main() {
 	if err := run(os.Args[1:], os.Stdin, os.Stdout); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func currentAppVersion() string {
+	if version := strings.TrimSpace(os.Getenv("CORPORATE_VERSION")); version != "" {
+		return version
+	}
+	if version := strings.TrimSpace(os.Getenv("VERSION")); version != "" {
+		return version
+	}
+	return defaultAppVersion
+}
+
+func releaseRepoURL() string {
+	if repo := strings.TrimSpace(os.Getenv("CORPORATE_GITHUB_REPO")); repo != "" {
+		return normalizeReleaseRepoURL(repo)
+	}
+	if repo := strings.TrimSpace(os.Getenv("GITHUB_REPOSITORY")); repo != "" {
+		return "https://api.github.com/repos/" + strings.Trim(repo, "/")
+	}
+	return "https://api.github.com/repos/CDRO/corporate-cli"
+}
+
+func normalizeReleaseRepoURL(repo string) string {
+	repo = strings.TrimSpace(repo)
+	repo = strings.TrimSuffix(repo, "/")
+	repo = strings.TrimPrefix(repo, "https://api.github.com/repos/")
+	repo = strings.TrimPrefix(repo, "http://api.github.com/repos/")
+	repo = strings.TrimPrefix(repo, "https://github.com/")
+	repo = strings.TrimPrefix(repo, "http://github.com/")
+	repo = strings.TrimPrefix(repo, "/")
+	if repo == "" {
+		return "https://api.github.com/repos/CDRO/corporate-cli"
+	}
+	return "https://api.github.com/repos/" + repo
 }
 
 func run(args []string, stdin io.Reader, stdout io.Writer) error {
@@ -62,7 +96,7 @@ func handleUpdate(args []string, stdout io.Writer) error {
 
 	switch args[0] {
 	case "--check", "-c":
-		result, err := update.CheckForRelease("https://api.github.com/repos/tizia/corporate-cli", appVersion)
+		result, err := update.CheckForRelease(releaseRepoURL(), currentAppVersion())
 		if err != nil {
 			return err
 		}
