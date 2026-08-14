@@ -8,6 +8,7 @@ import (
 var whitespacePattern = regexp.MustCompile(`\s+`)
 var repeatedPunctuationPattern = regexp.MustCompile(`[!?.,;:]{2,}`)
 var spacingPattern = regexp.MustCompile(`\s+([,.;:!?])`)
+var uppercaseShoutPattern = regexp.MustCompile(`(?m)\b[A-Z]{3,}\b`)
 
 var wholeWordReplacements = []struct {
 	pattern    *regexp.Regexp
@@ -15,6 +16,7 @@ var wholeWordReplacements = []struct {
 }{
 	{pattern: regexp.MustCompile(`(?i)\btotaly\b`), replacement: "totally"},
 	{pattern: regexp.MustCompile(`(?i)\btotallly\b`), replacement: "totally"},
+	{pattern: regexp.MustCompile(`(?i)\bmangment\b`), replacement: "management"},
 	{pattern: regexp.MustCompile(`(?i)\bdont\b`), replacement: "don't"},
 	{pattern: regexp.MustCompile(`(?i)\barent\b`), replacement: "aren't"},
 	{pattern: regexp.MustCompile(`(?i)\bcant\b`), replacement: "can't"},
@@ -32,6 +34,7 @@ var wholeWordReplacements = []struct {
 	{pattern: regexp.MustCompile(`(?i)\buseless\b`), replacement: "underperforming"},
 	{pattern: regexp.MustCompile(`(?i)\bdisgrace\b`), replacement: "opportunity for improvement"},
 	{pattern: regexp.MustCompile(`(?i)\bmess\b`), replacement: "challenge"},
+	{pattern: regexp.MustCompile(`(?i)\blazy\b`), replacement: "demonstrating limited execution efficiency"},
 }
 
 func normalizeText(input string) string {
@@ -46,16 +49,46 @@ func normalizeText(input string) string {
 	).Replace(text)
 
 	text = whitespacePattern.ReplaceAllString(text, " ")
-	for _, item := range wholeWordReplacements {
-		text = item.pattern.ReplaceAllString(text, item.replacement)
-	}
-
+	text = collapseRepeatedWords(text)
+	text = strings.NewReplacer(
+		"!!!", "!",
+		"???", "?",
+		"??", "?",
+		"!!", "!",
+		"!!! ?", "!?",
+		"?? !", "?!",
+	).Replace(text)
 	text = repeatedPunctuationPattern.ReplaceAllStringFunc(text, func(match string) string {
 		return string(match[len(match)-1])
 	})
 	text = spacingPattern.ReplaceAllString(text, "$1")
+	text = uppercaseShoutPattern.ReplaceAllStringFunc(text, func(match string) string {
+		return strings.ToLower(match)
+	})
+	for _, item := range wholeWordReplacements {
+		text = item.pattern.ReplaceAllString(text, item.replacement)
+	}
 
-	return strings.TrimSpace(text)
+	text = strings.TrimSpace(text)
+	return text
+}
+
+func collapseRepeatedWords(text string) string {
+	parts := strings.Fields(text)
+	if len(parts) < 3 {
+		return text
+	}
+
+	out := make([]string, 0, len(parts))
+	for i := 0; i < len(parts); i++ {
+		if i+2 < len(parts) && strings.EqualFold(parts[i], parts[i+1]) && strings.EqualFold(parts[i+1], parts[i+2]) {
+			out = append(out, parts[i])
+			i += 2
+			continue
+		}
+		out = append(out, parts[i])
+	}
+	return strings.Join(out, " ")
 }
 
 // Corporateize rewrites text into a more corporate tone.
@@ -67,30 +100,56 @@ func Corporateize(input string) string {
 
 	lower := strings.ToLower(text)
 	lower = strings.NewReplacer(
-		"these team members", "the project team",
-		"team members", "project team members",
+		"these dumbasses", "the project team",
+		"dumbasses", "the project team",
+		"these clowns", "these stakeholders",
+		"clowns", "stakeholders",
+		"mangment", "management",
+		"lazy as hell", "demonstrating limited execution efficiency",
+		"lazy", "demonstrating limited execution efficiency",
+		"fucking mess", "significant operational challenges",
+		"fucking", "significant",
+		"stupid mistakes", "avoidable errors",
+		"incompetent", "not meeting expected performance standards",
+		"dont understand", "do not fully appreciate",
+		"doesnt understand", "does not fully appreciate",
+		"the whole thing is a mess", "the current situation presents significant operational challenges",
+		"this is a significant challenge", "the current situation presents significant operational challenges",
+		"the deadline is getting pushed", "the delivery timeline requires improved coordination",
+		"deadline is getting pushed", "the delivery timeline requires improved coordination",
+		"the whole thing is a challenge", "the current situation presents significant operational challenges",
+		"whole thing is a challenge", "the current situation presents significant operational challenges",
+		"the project team in the project team", "the project team",
+		"project team in the project team", "the project team",
+		"the project team are", "the project team is",
 		"the project team members", "the project team",
-		"significant challenge", "significant challenge",
-		"significant challenges", "significant challenges",
-		"overall situation", "overall situation",
-		"whole thing is a challenge", "the overall situation reflects significant operational challenges",
-		"whole thing is a mess", "the overall situation reflects significant operational challenges",
-		"the deadline is getting pushed", "the delivery timeline requires alignment",
-		"do not fully align with the current requirements", "do not fully align with the current requirements",
-		"really bad", "substantially misaligned",
-		"inconsistent decisions", "inconsistent execution decisions",
-		"underperforming", "underperforming",
-		"opportunity for improvement", "opportunity for improvement",
 		"team members", "project team members",
 		"project team members are", "the project team is",
-		"don't understand", "do not fully appreciate",
-		"doesn't understand", "does not fully appreciate",
-		"not aligned with expectations", "not aligned with current expectations",
-		"significant operational challenges", "significant operational challenges",
-		"problematic", "challenging",
-		"concerns", "concerns",
+		"these team members", "the project team",
+		"do not fully appreciate basic requirements", "do not fully appreciate the basic requirements",
+		"significant challenge", "significant operational challenge",
+		"significant challenges", "significant operational challenges",
+		"opportunity for improvement", "an opportunity for improvement",
+		"challenges", "operational challenges",
+		"challenge", "operational challenge",
 	).Replace(lower)
 
+	lower = strings.NewReplacer(
+		"the the ", "the ",
+		"  ", " ",
+		" ,", ",",
+		" .", ".",
+		"project team members members", "project team members",
+		"the project team the project team", "the project team",
+	).Replace(lower)
+
+	lower = strings.TrimSpace(lower)
+	if lower == "" {
+		return ""
+	}
+	if lower[len(lower)-1] != '.' {
+		lower += "."
+	}
 	if len(lower) > 0 {
 		lower = strings.ToUpper(lower[:1]) + lower[1:]
 	}
