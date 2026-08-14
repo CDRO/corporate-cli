@@ -207,10 +207,15 @@ The required workflow is:
 3. For each ticket or subtask worked on in that version, create a new branch from the release branch, not from `main`.
 4. Ticket branch names follow the pattern `version/xy-release/<ticket-slug>`.
 5. Finish the work on the ticket branch and push it to GitHub for review.
-6. The ticket branch must be reviewed on GitHub and any review findings must be fixed on that ticket branch and pushed again before merge approval.
-7. After review passes, merge the ticket branch on GitHub into the release branch.
-8. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
-9. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
+6. Every review pass must be posted as a separate PR comment. Each comment must state the blocker, the required fix, and the expected evidence. The review is not complete until the comment is on the PR.
+7. After each PR comment, the author must fix the issue on the same ticket branch in a dedicated commit and push it before the next review pass or merge approval. Silent fixes without a comment are not valid.
+8. The ticket branch must be reviewed on GitHub and any review findings must be fixed on that ticket branch and pushed again before merge approval.
+9. After review passes, merge the ticket branch on GitHub into the release branch.
+10. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
+11. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
+12. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
+13. Do not merge ticket branches directly into `main`.
+14. Once the version is complete and validated, merge the release branch into `main`.
 10. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
 11. Do not merge ticket branches directly into `main`.
 12. Once the version is complete and validated, merge the release branch into `main`.

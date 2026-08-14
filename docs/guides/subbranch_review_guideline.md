@@ -7,6 +7,19 @@ This review must be adversarial, explicit, and actionable. It is not a formality
 
 The review is designed to be repeated up to 10 times for the same subbranch. Each pass must produce concrete action items, and the branch must not be merged until all blocking issues are fixed.
 
+### Mandatory comment-then-fix sequence
+This is a hard requirement and not a recommendation.
+
+For every review pass:
+
+1. The reviewer must create a separate PR comment that names the issue, identifies the risk, and states the required fix.
+2. The author must fix the issue on the same ticket branch in a new commit.
+3. The author must push that fix before the next review pass or before merge approval.
+4. A review pass is not considered complete if the code changed silently without a PR comment and a corresponding fix-up commit.
+5. A branch that skips the comment -> fix commit -> push sequence is non-compliant and must be corrected before merge.
+
+This sequence is mandatory for every pass, not just the final pass.
+
 ---
 
 ## Scope
@@ -198,6 +211,9 @@ The following rules are mandatory:
 6. The reviewer should not accept a branch just because it looks plausible.
 7. The agent must fix all blockers before requesting approval.
 8. A branch may be reviewed up to 10 times, but after the final failed pass, it must be corrected and re-reviewed before any merge can happen.
+9. Every review pass must be posted as a separate PR comment before the fix is merged. The comment must name the blocker, the required action, and the verification or evidence expected.
+10. Every review comment must be matched by a fix commit on the same ticket branch and pushed to GitHub before the next review pass or merge approval. Silent fixes without a review comment are not valid.
+11. The branch is not review-complete until the PR contains the full comment trail and the corresponding fix commits for each issue addressed.
 
 ---
 
