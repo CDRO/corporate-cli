@@ -26,22 +26,22 @@ If a file is missing, stop and restore it from the repo before continuing. Do no
 ## Required branch workflow
 The project uses version milestones as delivery units. Every v0 task must follow the version workflow:
 
-- create or use a working branch from `main`: `version/00` or `version/00/<ticket-slug>`
-- all implementation work must happen on a ticket branch derived from the version branch
-- ticket branches are squash-merged back into the version branch
+- create or use a working branch from `main`: `version/00-release` or `version/00-release/<ticket-slug>`
+- all implementation work must happen on a ticket branch derived from the release branch
+- ticket branches are squash-merged back into the release branch
 - do not merge ticket work directly into `main`
 
 Example flow:
 
 ```text
 main
-  -> version/00
-      -> version/00/cli-contract
-      -> version/00/input-output
-      -> version/00/rule-engine
-  -> squash merge back to version/00
+  -> version/00-release
+      -> version/00-release/cli-contract
+      -> version/00-release/input-output
+      -> version/00-release/rule-engine
+  -> squash merge back to version/00-release
   -> final review
-  -> merge version/00 into main
+  -> merge version/00-release into main
 ```
 
 ---

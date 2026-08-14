@@ -14,15 +14,15 @@ The roadmap is deliberately staged so the team can ship a reliable core first an
 ## Branching policy (mandatory)
 The repository must follow a version-based branch workflow so that both developers and AI agents stay aligned with the GitHub version milestones used for delivery.
 
-1. When work begins on a GitHub version milestone, create a branch from `main` named `version/xy`, where `xy` is the version number. Examples: `version/00`, `version/01`, `version/02`.
-2. A version branch must be created only once active work for that version begins; it must not exist before implementation starts.
-3. For each ticket or subtask worked on within that version, create a new branch from the version branch, not from `main`.
-4. Ticket branch names must follow the pattern `version/xy/<ticket-slug>`, for example `version/01/rewrite-pipeline` or `version/02/provider-integration`.
-5. All ticket work must be completed on the ticket branch and then squash-merged back into the version branch.
+1. When work begins on a GitHub version milestone, create a branch from `main` named `version/xy-release`, where `xy` is the version number. Examples: `version/00-release`, `version/01-release`, `version/02-release`.
+2. A release branch must be created only once active work for that version begins; it must not exist before implementation starts.
+3. For each ticket or subtask worked on within that version, create a new branch from the release branch, not from `main`.
+4. Ticket branch names must follow the pattern `version/xy-release/<ticket-slug>`, for example `version/01-release/rewrite-pipeline` or `version/02-release/provider-integration`.
+5. All ticket work must be completed on the ticket branch and then squash-merged back into the release branch.
 6. Ticket branches must never be merged directly into `main`.
-7. The version branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
-8. Only after the version is fully reviewed and validated should the version branch be merged into `main`.
-9. In short: `main` -> `version/xy` -> `version/xy/<ticket-slug>` -> squash merge back to `version/xy` -> review -> `main`.
+7. The release branch acts as the integration branch for that release phase and remains separate from `main` until the version is complete and approved.
+8. Only after the version is fully reviewed and validated should the release branch be merged into `main`.
+9. In short: `main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> squash merge back to `version/xy-release` -> review -> `main`.
 
 This prevents long-lived feature branches from drifting away from `main`, keeps each version isolated, and gives every issue a clear, reviewable delivery path.
 
@@ -31,8 +31,8 @@ Every accepted merge into a version branch must immediately trigger a GitHub rel
 
 1. Release tags must follow the format `v<major>.<minor>.0`, where `<major>` is the milestone number and `<minor>` is the next release counter for that milestone.
 2. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
-3. A merge into `version/00` produces a `v0.<n>.0` release; a merge into `version/01` produces a `v1.<n>.0` release.
-4. The GitHub release must be generated automatically by CI/CD as soon as the merge lands on the version branch.
+3. A merge into `version/00-release` produces a `v0.<n>.0` release; a merge into `version/01-release` produces a `v1.<n>.0` release.
+4. The GitHub release must be generated automatically by CI/CD as soon as the merge lands on the release branch.
 5. Every release artifact bundle must contain builds for Linux, macOS, and Windows.
 6. Release notes must describe the merged scope and attach the generated binaries for the target platform set.
 
@@ -45,15 +45,15 @@ Every ticket branch must be reviewed by an AI agent before it can be merged into
 2. The review must follow the subbranch review guideline and must use up to 10 review passes if needed.
 3. The review result must be recorded in a dedicated review artifact before the merge request is approved.
 4. The review must produce explicit blockers, required fixes, verification commands, and a final verdict.
-5. No ticket branch may be merged into `version/xy` unless the review passes and all blockers are fixed.
+5. No ticket branch may be merged into `version/xy-release` unless the review passes and all blockers are fixed.
 6. The merge is blocked if the review artifact is missing, incomplete, or rejected.
 7. This rule applies to both human and AI implementations.
 
 The intended flow becomes:
 
-`main` -> `version/xy` -> `version/xy/<ticket-slug>` -> AI review -> fix issues -> squash merge -> `version/xy` -> review -> `main`
+`main` -> `version/xy-release` -> `version/xy-release/<ticket-slug>` -> AI review -> fix issues -> squash merge -> `version/xy-release` -> review -> `main`
 
-This ensures that AI-generated work is checked by an independent, adversarial review pass before it enters the version branch.
+This ensures that AI-generated work is checked by an independent, adversarial review pass before it enters the release branch.
 
 ---
 
