@@ -21,6 +21,7 @@ jobs:
       - name: Generate milestone pages from closed issues
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_AUTHOR: ${{ github.actor }}
         run: |
           set -euo pipefail
           python -m pip install markdown
@@ -55,6 +56,7 @@ jobs:
               [
                   'gh', 'issue', 'list',
                   '--state', 'closed',
+                  '--author', os.environ.get('GH_AUTHOR', os.environ.get('GITHUB_ACTOR', '')),
                   '--limit', '200',
                   '--json', 'number,title,body,url',
               ],
@@ -255,7 +257,13 @@ jobs:
 
           major = major_match.group(1)
           issue_json = subprocess.check_output(
-              ['gh', 'issue', 'list', '--state', 'closed', '--limit', '200', '--json', 'body'],
+              [
+                  'gh', 'issue', 'list',
+                  '--state', 'closed',
+                  '--author', os.environ.get('GH_AUTHOR', os.environ.get('GITHUB_ACTOR', '')),
+                  '--limit', '200',
+                  '--json', 'body',
+              ],
               text=True,
               env={**os.environ, 'GH_TOKEN': os.environ['GH_TOKEN']},
           )
