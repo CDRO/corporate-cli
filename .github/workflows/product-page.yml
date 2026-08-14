@@ -94,7 +94,7 @@ jobs:
               if not milestone_pattern.match(first_line):
                   continue
 
-              page_name = re.sub(milestone_pattern, '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
+              page_name = re.sub(milestone_pattern, '', first_line).strip() or issue.get('title', '').strip()
               content = '\n'.join(line for line in body.splitlines()[1:] if line.strip())
               if not content:
                   content = issue.get('title', '').strip()
