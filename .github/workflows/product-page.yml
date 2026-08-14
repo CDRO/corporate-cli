@@ -46,11 +46,11 @@ jobs:
               value = re.sub(r'-+', '-', value).strip('-')
               return value or 'milestone'
 
-          def milestone_sort_key(name: str):
-              match = re.search(r'Milestone\s+(\d+)', name, re.I)
+          def milestone_number_from_header(value: str):
+              match = re.search(r'^#+\s*Milestone\s+(\d+)', value, re.I)
               if match:
-                  return (0, int(match.group(1)))
-              return (1, name.lower())
+                  return int(match.group(1))
+              return None
 
           issue_json = subprocess.check_output(
               [
@@ -79,19 +79,20 @@ jobs:
               else:
                   print(f"DEBUG: Processing issue #{issue.get('number')} - first line: '{first_line}'")
 
-              page_name = re.sub(r'^#+\s*Milestone \d+:\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
+              milestone_number = milestone_number_from_header(first_line) or 999999
+              page_name = re.sub(r'^#+\s*Milestone\s+\d+\s*[:.-]?\s*', '', first_line, flags=re.I).strip() or issue.get('title', '').strip()
               content = '\n'.join(line for line in body.splitlines()[1:] if line.strip())
               if not content:
                   content = issue.get('title', '').strip()
 
               slug = slugify(page_name)
               page_html = markdown.markdown(content or page_name, extensions=['extra', 'sane_lists', 'tables'])
-              pages.append((slug, page_name, page_html))
+              pages.append((milestone_number, slug, page_name, page_html))
 
-          pages = sorted(pages, key=lambda item: milestone_sort_key(item[1]))
+          pages = sorted(pages, key=lambda item: item[0])
           print(f"DEBUG: Eligible milestone pages after filtering: {len(pages)}")
-          for slug, page_name, page_html in pages:
-              print(f"DEBUG: Page={slug}.html | Title={page_name}")
+          for milestone_number, slug, page_name, page_html in pages:
+              print(f"DEBUG: Milestone={milestone_number} | Page={slug}.html | Title={page_name}")
               print(f"DEBUG: Page content preview:\n{page_html[:1200]}\n---END PREVIEW---")
 
           nav = '''
@@ -126,14 +127,14 @@ jobs:
               <h1>corporate-cli</h1>
               <p>Versioned milestone pages generated from closed GitHub issues.</p>
               <ul>
-                {''.join(f'<li><a href="{slug}.html">{page_name}</a></li>' for slug, page_name, _ in pages)}
+                {''.join(f'<li><a href="{slug}.html">{page_name}</a></li>' for _, slug, page_name, _ in pages)}
               </ul>
             </body>
           </html>
           '''
           (public_dir / 'index.html').write_text(index_html, encoding='utf-8')
 
-          milestone_links = ''.join(f'<li><a href="{slug}.html">{page_name}</a></li>' for slug, page_name, _ in pages)
+          milestone_links = ''.join(f'<li><a href="{slug}.html">{page_name}</a></li>' for _, slug, page_name, _ in pages)
           milestone_html = f'''<!doctype html>
           <html lang="en">
             <head>
@@ -151,7 +152,7 @@ jobs:
           '''
           (public_dir / 'milestones.html').write_text(milestone_html, encoding='utf-8')
 
-          for slug, page_name, page_html in pages:
+          for _, slug, page_name, page_html in pages:
               content = f'''<!doctype html>
               <html lang="en">
                 <head>
