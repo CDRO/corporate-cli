@@ -99,3 +99,47 @@ func TestCorporateizeCoversMilestoneExamples(t *testing.T) {
 	}
 }
 
+func TestCorporateizeCoversMilestone15FixtureMatrix(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  []string
+		banned []string
+	}{
+		{
+			name:  "basic transformation",
+			input: "these dumbasses in the project team are totaly incompetent, the whole thing is a fucking mess, and the deadline is getting pushed because these clowns keep making stupid mistakes and dont even understand basic requirements.",
+			want:  []string{"project team", "not meeting expected performance standards", "significant operational challenge", "requirements", "coordination"},
+			banned: []string{"dumbasses", "fucking", "clowns", "stupid"},
+		},
+		{
+			name:  "misspelling normalization",
+			input: "totaly dont arent mangment are bad bad bad",
+			want:  []string{"totally", "don't", "aren't", "management"},
+			banned: []string{"totaly", "dont", "arent", "mangment"},
+		},
+		{
+			name:  "punctuation and shouting",
+			input: "THIS IS A DISASTER!!! THIS IS A FUCKING MESS!!!",
+			want:  []string{"this is a disaster", "significant", "operational", "challenge"},
+			banned: []string{"!!!", "fucking"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Corporateize(tt.input)
+			for _, want := range tt.want {
+				if !containsFold(got, want) {
+					t.Fatalf("Corporateize(%q) = %q, want substring %q", tt.input, got, want)
+				}
+			}
+			for _, banned := range tt.banned {
+				if containsFold(got, banned) {
+					t.Fatalf("Corporateize(%q) = %q, should not retain banned phrase %q", tt.input, got, banned)
+				}
+			}
+		})
+	}
+}
+
