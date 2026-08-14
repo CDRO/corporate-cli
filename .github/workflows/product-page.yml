@@ -12,6 +12,24 @@ permissions:
   id-token: write
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      app_changed: ${{ steps.filter.outputs.app }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect app code changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            app:
+              - 'cmd/**'
+              - 'internal/**'
   product-page:
     runs-on: ubuntu-latest
     steps:
@@ -177,10 +195,27 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+  test:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          go test -v ./...
   build-artifacts:
     runs-on: ubuntu-latest
-    needs: product-page
+    needs: [changes, test]
+    if: needs.changes.outputs.app == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -214,8 +249,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          go build -o "dist/corporate-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.ext }}" ./cmd/corporate
-          GOOS="${{ matrix.goos }}" GOARCH="${{ matrix.goarch }}" go build -o "dist/etaroproc-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.ext }}" ./cmd/corporate
+          GOOS="${{ matrix.goos }}" GOARCH="${{ matrix.goarch }}" go build -o "dist/corporate-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.ext }}" ./cmd/corporate
+          GOOS="${{ matrix.goos }}" GOARCH="${{ matrix.goarch }}" go build -o "dist/etaroproc-${{ matrix.os }}-${{ matrix.goarch }}${{ matrix.ext }}" ./cmd/etaroproc
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
