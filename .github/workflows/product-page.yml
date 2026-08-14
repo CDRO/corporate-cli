@@ -82,6 +82,7 @@ jobs:
               env={**os.environ, 'GH_TOKEN': os.environ['GH_TOKEN']},
           )
           issues = json.loads(issue_json)
+          print(f"DEBUG: Found {len(issues)} closed issues authored by {os.environ.get('GH_AUTHOR', os.environ.get('GITHUB_ACTOR', ''))}")
 
           pages = []
           for issue in issues:
@@ -103,6 +104,10 @@ jobs:
               pages.append((slug, page_name, page_html))
 
           pages = sorted(pages, key=lambda item: milestone_sort_key(item[1]))
+          print(f"DEBUG: Eligible milestone pages after filtering: {len(pages)}")
+          for slug, page_name, page_html in pages:
+              print(f"DEBUG: Page={slug}.html | Title={page_name}")
+              print(f"DEBUG: Page content preview:\n{page_html[:1200]}\n---END PREVIEW---")
 
           nav = '''
           <nav class="top-nav">
