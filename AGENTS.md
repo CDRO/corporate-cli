@@ -42,8 +42,9 @@ The agent must follow the project delivery model exactly:
 6. After the ticket is complete, create a git commit with a clear message that explains what changed and why, then push the ticket branch to GitHub for review
 7. The branch must be reviewed in GitHub before merge. Any review findings must be fixed on the same ticket branch and pushed again before approval
 8. After review passes, merge the ticket branch on GitHub into the release branch
-9. After the GitHub merge completes, pull the updated release branch locally with `git pull --ff-only origin version/<phase>-release`
-10. Only merge the release branch into `main` after validation and review
+9. After the GitHub merge completes, close the linked issue on GitHub if it is not already auto-closed by the PR merge. Use the PR closing keyword such as `Closes #123` or close the issue immediately after the merge when automation is not in place
+10. After the issue is closed, pull the updated release branch locally with `git pull --ff-only origin version/<phase>-release`
+11. Only merge the release branch into `main` after validation and review
 
 ## Rules
 
