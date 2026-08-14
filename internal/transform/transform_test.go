@@ -27,6 +27,20 @@ func TestCorporateizeHandlesEmptyInput(t *testing.T) {
 	if got := Corporateize(""); got != "" {
 		t.Fatalf("expected empty string, got %q", got)
 	}
+	if got := Corporateize("   \n\t  "); got != "" {
+		t.Fatalf("expected whitespace-only input to be empty, got %q", got)
+	}
+	if got := Corporateize("!!!"); got != "" {
+		t.Fatalf("expected punctuation-only input to be empty, got %q", got)
+	}
+}
+
+func TestCorporateizePreservesTechnicalNames(t *testing.T) {
+	input := "PM says SLA is broken and release-v2-final.txt is late"
+	got := Corporateize(input)
+	if !containsFold(got, "sla") && !containsFold(got, "release-v2-final.txt") {
+		t.Fatalf("expected technical names to be preserved, got %q", got)
+	}
 }
 
 func TestInverseCorporateize(t *testing.T) {

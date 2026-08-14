@@ -41,6 +41,9 @@ func normalizeText(input string) string {
 	text := strings.ReplaceAll(input, "\r\n", "\n")
 	text = strings.ReplaceAll(text, "\r", "\n")
 	text = strings.TrimSpace(text)
+	if text == "" {
+		return ""
+	}
 	text = strings.NewReplacer(
 		"’", "'",
 		"‘", "'",
@@ -70,6 +73,12 @@ func normalizeText(input string) string {
 	}
 
 	text = strings.TrimSpace(text)
+	if text == "" {
+		return ""
+	}
+	if strings.Trim(text, "!?.,;: \n\t") == "" {
+		return ""
+	}
 	return text
 }
 
@@ -99,6 +108,15 @@ func Corporateize(input string) string {
 	}
 
 	lower := strings.ToLower(text)
+	lower = strings.NewReplacer(
+		"release-v2-final.txt", "release-v2-final.txt",
+		"sla", "SLA",
+		"pm", "PM",
+		"cto", "CTO",
+		"qa", "QA",
+		"adr", "ADR",
+	).Replace(lower)
+
 	lower = strings.NewReplacer(
 		"these dumbasses", "the project team",
 		"dumbasses", "the project team",
