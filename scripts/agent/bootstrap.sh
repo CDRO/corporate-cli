@@ -66,17 +66,17 @@ validate_work_branch() {
   branch="$(git branch --show-current 2>/dev/null || true)"
 
   if [[ -z "$branch" || "$branch" == "main" || "$branch" == "master" ]]; then
-    echo "ERROR: work must not start on main/master. Create a milestone branch and a ticket subbranch before implementation. Pattern: version/<phase>/<ticket-slug>." >&2
+    echo "ERROR: work must not start on main/master. Create a release branch and a ticket subbranch before implementation. Pattern: version/<phase>-release and version/<phase>-release/<ticket-slug>." >&2
     exit 1
   fi
 
-  if [[ "$branch" =~ ^version/[0-9]+$ ]]; then
-    echo "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>/<ticket-slug>" >&2
+  if [[ "$branch" =~ ^version/[0-9]+-release$ ]]; then
+    echo "ERROR: milestone branch alone is not enough. Create a ticket subbranch before implementation: git switch -c version/<phase>-release/<ticket-slug>" >&2
     exit 1
   fi
 
-  if [[ ! "$branch" =~ ^version/[0-9]+/[A-Za-z0-9._/-]+$ ]]; then
-    echo "ERROR: invalid branch '$branch'. Required pattern: version/<phase>/<ticket-slug>." >&2
+  if [[ ! "$branch" =~ ^version/[0-9]+-release/[A-Za-z0-9._/-]+$ ]]; then
+    echo "ERROR: invalid branch '$branch'. Required pattern: version/<phase>-release/<ticket-slug>." >&2
     exit 1
   fi
 
