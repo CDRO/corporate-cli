@@ -17,6 +17,9 @@ func TestDefaultStorePathUsesUserConfigDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("DefaultStorePath returned error: %v", err)
 	}
+	if path == "" {
+		t.Fatal("expected store path, got empty string")
+	}
 	if filepath.Base(path) != "config.json" {
 		t.Fatalf("expected config.json store name, got %q", filepath.Base(path))
 	}
@@ -74,10 +77,13 @@ func TestWriteConfigDoesNotCreateSecretsInPlainTextOutput(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read config file: %v", err)
 	}
-	if len(data) == 0 {
+	if string(data) == "" {
 		t.Fatal("expected config file to be written")
 	}
-	if string(data) == "secret-token" {
+	if len(data) == 0 {
 		t.Fatal("config file should contain data")
+	}
+	if string(data) == "secret-token" {
+		t.Fatal("sensitive data should not be encoded as raw plain text in the output path")
 	}
 }

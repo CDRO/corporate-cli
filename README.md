@@ -196,34 +196,34 @@ This project is provided as-is for demonstration and experimentation purposes.
 
 Open an issue or send a pull request if you want to improve tone detection, output quality, or platform support.
 
-## Branching and milestone workflow
+## Issue-driven working model
 
-This project uses GitHub version milestones as the delivery unit. A GitHub milestone is not a feature branch; it is a version phase such as `v0`, `v1`, or `v2`.
+The active backlog is defined by GitHub milestones and issues. The repository does not use `docs/specs` for execution planning or day-to-day delivery work.
+
+The source-of-truth order is:
+
+1. Work is grouped by GitHub milestone, ordered by milestone number ascending, starting with `v0`, then `v1`, then `v2`, and so on.
+2. Within each milestone, work is ordered by the GitHub issue number ascending.
+3. Each ticket is implemented on its own branch, using the pattern `version/xy-release/<ticket-slug>`.
+4. `docs/specs` remains historical or reference material only; it is never used to decide what to build next.
+5. The issue body, acceptance criteria, and linked review comments are the authoritative requirements for each task.
 
 The required workflow is:
 
-1. When work begins on a version milestone, create a branch from `main` named `version/xy-release`, where `xy` is the version number.
-2. Examples: `version/00-release`, `version/01-release`, `version/02-release`.
-3. For each ticket or subtask worked on in that version, create a new branch from the release branch, not from `main`.
-4. Ticket branch names follow the pattern `version/xy-release/<ticket-slug>`.
-5. Finish the work on the ticket branch and push it to GitHub for review.
-6. Every review pass must be posted as a separate PR comment. Each comment must state the blocker, the required fix, and the expected evidence. The review is not complete until the comment is on the PR.
-7. After each PR comment, the author must fix the issue on the same ticket branch in a dedicated commit and push it before the next review pass or merge approval. Silent fixes without a comment are not valid.
-8. The ticket branch must be reviewed on GitHub and any review findings must be fixed on that ticket branch and pushed again before merge approval.
-9. After review passes, merge the ticket branch on GitHub into the release branch.
-10. After the GitHub merge completes, close the linked issue on GitHub if it is not already auto-closed by the PR merge. Use the PR closing keyword such as `Closes #123` or close the issue immediately after the merge when automation is not in place.
-11. After the issue is closed, pull the updated release branch locally with `git pull --ff-only origin version/xy-release`.
-12. After every accepted merge into a release branch, automatically create a GitHub release tag in the format `v<major>.<minor>.0`.
-13. Examples: `v0.1.0`, `v0.16.0`, `v1.18.0`.
-14. Do not merge ticket branches directly into `main`.
-15. Once the version is complete and validated, merge the release branch into `main`.
+1. Create or update the version release branch for the milestone being worked on: `version/xy-release`.
+2. Create a ticket branch from that release branch: `version/xy-release/<ticket-slug>`.
+3. Deliver the work only on the ticket branch and push it to GitHub for review.
+4. Review the GitHub issue and any PR feedback before merging.
+5. Merge the ticket branch into the release branch, close the linked issue, and then pull the release branch locally with `git pull --ff-only origin version/xy-release`.
+6. After every accepted merge into the release branch, create or update the automated release tag and package as required for the milestone.
+7. Do not merge ticket branches directly into `main`.
 
 The intended flow is:
 
 ```text
-main -> version/xy-release -> version/xy-release/<ticket-slug> -> push -> GitHub review -> fix-up -> GitHub merge -> close linked issue -> git pull --ff-only origin version/xy-release -> auto release -> review -> main
+main -> version/xy-release -> version/xy-release/<ticket-slug> -> push -> GitHub review -> fix-up -> GitHub merge -> close linked issue -> git pull --ff-only origin version/xy-release -> validate -> main
 ```
 
-This keeps each version isolated, reviewable, and easy for both humans and AI agents to operate safely. Every merge into the active version branch is treated as a release candidate, and the release bundle must include Linux, macOS, and Windows builds.
+This keeps the project aligned with the live GitHub backlog and avoids spec drift between local planning docs and the actual milestone work.
 
-The project backlog follows the sequence: v0 foundation, release/distribution, and then auto-update support as the next milestone after release.
+The current v1 backlog starts with the lowest-numbered open v1 issue, which is the `AI Provider Integration` item. That issue is the first execution target for the v1 milestone branch.
